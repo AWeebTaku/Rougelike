@@ -71,6 +71,25 @@ def load_game(filename: str) -> Engine:
     assert isinstance(engine, Engine)
     return engine
 
+class ControlsScreen(input_handlers.BaseEventHandler):
+    """Display the game controls."""
+    def on_render(self, console: tcod.Console) -> None:
+        console.draw_frame(0, 0, 80, 12, title="Controls")
+        console.print(2, 2, "Move: Arrow Keys")
+        console.print(2, 3, "Attack: Move in Enemy Direction")
+        console.print(2, 4, "Character: Press [C]")
+        console.print(2, 5, "Pick Up: Move on Top of the [!] mark and Press [G]")
+        console.print(2, 6, "Inventory: Press [I] and Select the item to Equip/Unequip/Use")
+        console.print(2, 7, "Drop: Press [D] and Select the item to Drop")
+        console.print(2, 8, "Stairs: Move on Top of the [>] mark and Press [Shift + >]")
+        console.print(2, 9, "Message History: Press [V]")
+        console.print(2, 12, "Back: ESC")
+
+    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[input_handlers.BaseEventHandler]:
+        if event.sym == tcod.event.K_ESCAPE:
+            return MainMenu()
+        return None
+
 
 class MainMenu(input_handlers.BaseEventHandler):
     """Handle the main menu rendering and input."""
@@ -96,7 +115,7 @@ class MainMenu(input_handlers.BaseEventHandler):
 
         menu_width = 24
         for i, text in enumerate(
-            ["[N] Play a new game", "[C] Continue last game", "[Q] Quit"]
+            ["[N] Play a new game", "[C] Continue last game", "[X] Controls","[Q] Quit"]
         ):
             console.print(
                 console.width // 2,
@@ -123,5 +142,7 @@ class MainMenu(input_handlers.BaseEventHandler):
                 return input_handlers.PopupMessage(self, f"Failed to load save:\n{exc}")
         elif event.sym == tcod.event.K_n:
             return input_handlers.MainGameEventHandler(new_game())
+        elif event.sym == tcod.event.K_x:
+            return ControlsScreen()
 
         return None
